@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -x
+source "$(git --exec-path)/git-sh-setup"
+
+# parameters 
+STABLE_BRANCH="master"
+FEATURE_PREFIX_BRANCH="feature/"
+RELEASE_PREFIX_BRANCH="release/"
+
+echo "cmd: "$@
+echo "param0: "$0
+echo "param1: "$1
+echo "param2: "$2
+echo "param3: "$3
+
+function _feature_start(){
+	echo 'starting feature' $1
+	git checkout $STABLE_BRANCH
+	git checkout -b $FEATURE_PREFIX_BRANCH$1
+}
+
+function _feature_finish(){
+	echo 'merging feature' $1 'into' $2
+	# save current feature-branch name
+	# checkout release-branch
+	# git merge feature-branch
+	# and delete feature-branch
+	git checkout $RELEASE_PREFIX_BRANCH$2
+	git merge --no-ff --no-edit $FEATURE_PREFIX_BRANCH$1
+	git branch -D $FEATURE_PREFIX_BRANCH$1
+}
+
+function _release_start(){
+	echo 'starting release' $1
+	git checkout $STABLE_BRANCH
+	git checkout -b $RELEASE_PREFIX_BRANCH$1
+}
+
+_$1_$2 $3 $4
